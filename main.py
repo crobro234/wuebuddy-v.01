@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import sqlite3
 import openai
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+import os
 
 app = FastAPI()
 openai.api_key = "YOUR_OPENAI_API_KEY"  # GPT api key 일단공란
@@ -17,6 +19,11 @@ app.add_middleware(
 def get_db():
     conn = sqlite3.connect("data/exchange_helper.db")
     return conn
+
+@app.get("/")
+def serve_home():
+    return FileResponse(os.path.join(os.path.dirname(__file__), "index.html"))
+
 
 # loading categories
 @app.get("/categories")
