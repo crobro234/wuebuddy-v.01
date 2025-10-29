@@ -141,9 +141,13 @@
     <div id="answer-box" data-aos="fade-up"></div>
   </div>
 
+  <!-- 🎬 JS -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init({ duration: 1000, once: true });
+
+    // ✅ 현재 도메인을 자동 인식해서 API 경로 생성
+    const API_BASE = window.location.origin;
 
     function showMain() {
       document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
@@ -155,24 +159,37 @@
     }
 
     async function loadCategories() {
-      const API_BASE = window.location.origin;
-      const data = await res.json();
-      const catDiv = document.querySelector("#categories");
-      catDiv.innerHTML = "";
-      data.categories.forEach(c => {
-        const btn = document.createElement("button");
-        btn.textContent = c.name;
-        btn.onclick = () => loadQuestions(c.id);
-        catDiv.appendChild(btn);
-      });
-      AOS.refresh();
+      try {
+        const res = await fetch(`${API_BASE}/categories`);
+        if (!res.ok) throw new Error("카테고리 로딩 실패");
+        const data = await res.json();
+        const catDiv = document.querySelector("#categories");
+        catDiv.innerHTML = "";
+        data.categories.forEach(c => {
+          const btn = document.createElement("button");
+          btn.textContent = c.name;
+          btn.onclick = () => loadQuestions(c.id);
+          catDiv.appendChild(btn);
+        });
+        if (data.categories.length === 0) {
+          catDiv.innerHTML = "<p>⚠️ 카테고리가 없습니다.</p>";
+        }
+        AOS.refresh();
+      } catch (err) {
+        console.error(err);
+        document.querySelector("#categories").innerHTML = "<p>❌ 카테고리를 불러올 수 없습니다.</p>";
+      }
     }
 
     async function loadQuestions(catId) {
-      const res = await fetch(`http://127.0.0.1:8080/questions/${catId}`);
+      const res = await fetch(`${API_BASE}/questions/${catId}`);
       const data = await res.json();
       const catDiv = document.getElementById("categories");
       catDiv.innerHTML = `<h3 data-aos="fade-right">질문 목록 📋</h3>`;
+      if (!data.questions || data.questions.length === 0) {
+        catDiv.innerHTML += "<p data-aos='fade-up'>아직 등록된 질문이 없습니다.</p>";
+        return;
+      }
       data.questions.forEach(q => {
         const btn = document.createElement("button");
         btn.textContent = q.question;
@@ -183,7 +200,7 @@
     }
 
     async function loadAnswer(qId) {
-      const res = await fetch(`http://127.0.0.1:8080/answer/${qId}`);
+      const res = await fetch(`${API_BASE}/answer/${qId}`);
       const data = await res.json();
       const box = document.getElementById("answer-box");
       box.style.display = "block";
