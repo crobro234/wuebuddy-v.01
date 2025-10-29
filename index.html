@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>WueBuddy | 뷔르츠부르크 교환학생 도우미</title>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+    html, body {
+      font-family: "Noto Sans KR", sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+    }
+
+    section > * { position: relative; z-index: 1; }
+
+    h1 { font-size: 2.8em; margin-bottom: 0.4em; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+    p { font-size: 1.3em; max-width: 800px; line-height: 1.6; }
+
+    .btn {
+      margin-top: 40px;
+      background-color: #0066ff;
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { background-color: #004bcc; }
+
+    /* 인트로 이미지 */
+    #intro1 { background-image: url('https://images.unsplash.com/photo-1559305616-3f99c7779865?auto=format&fit=crop&w=1600&q=80'); }
+    #intro2 { background-image: url('https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=1600&q=80'); }
+    #intro3 { background-image: url('https://images.unsplash.com/photo-1532948488455-68dabc39f023?auto=format&fit=crop&w=1600&q=80'); }
+    #intro4 { background-image: url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1600&q=80'); }
+
+    /* 메인 Q&A */
+    #mainContent {
+      display: none;
+      min-height: 100vh;
+      color: white;
+      background-image: url('https://images.unsplash.com/photo-1505842465776-3f8d0e164c59?auto=format&fit=crop&w=1600&q=80');
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      padding: 80px 40px;
+      position: relative;
+    }
+
+    #mainContent::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+    }
+
+    #mainContent > * { position: relative; z-index: 1; }
+
+    #categories button {
+      padding: 14px 24px;
+      background-color: rgba(255,255,255,0.2);
+      border: 2px solid #fff;
+      color: #fff;
+      border-radius: 10px;
+      margin: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1em;
+    }
+
+    #categories button:hover {
+      background-color: rgba(255,255,255,0.4);
+      transform: scale(1.05);
+    }
+
+    #answer-box {
+      margin-top: 40px;
+      padding: 25px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      width: 70%;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🎬 인트로 페이지 -->
+  <section id="intro1">
+    <h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1>
+  </section>
+
+  <section id="intro2">
+    <h1 data-aos="fade-right">🎓 그런데 뷔르츠부르크로 오신다고요?</h1>
+    <p data-aos="fade-left" data-aos-delay="200">새로운 나라, 새로운 대학... 준비할 게 너무 많죠.</p>
+  </section>
+
+  <section id="intro3">
+    <h1 data-aos="fade-left">📚 어디서부터 알아봐야 할지 막막하다면,</h1>
+    <p data-aos="fade-right" data-aos-delay="200">뷔르츠부르크 경험자가 직접 만든 가이드가 도와드릴게요.</p>
+  </section>
+
+  <section id="intro4">
+    <h1 data-aos="zoom-in">✨ WueBuddy</h1>
+    <p data-aos="fade-up" data-aos-delay="200">당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.</p>
+    <button class="btn" data-aos="fade-up" data-aos-delay="400" onclick="showMain()">시작하기 🚀</button>
+  </section>
+
+  <!-- 💬 메인 Q&A -->
+  <div id="mainContent" data-aos="fade-in">
+    <h2 data-aos="fade-down">카테고리 선택</h2>
+    <div id="categories" data-aos="zoom-in"></div>
+    <div id="answer-box" data-aos="fade-up"></div>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 1000, once: true });
+
+    function showMain() {
+      document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
+      const main = document.getElementById("mainContent");
+      main.style.display = "block";
+      AOS.refresh();
+      loadCategories();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function loadCategories() {
+      const API_BASE = window.location.origin;
+      const data = await res.json();
+      const catDiv = document.querySelector("#categories");
+      catDiv.innerHTML = "";
+      data.categories.forEach(c => {
+        const btn = document.createElement("button");
+        btn.textContent = c.name;
+        btn.onclick = () => loadQuestions(c.id);
+        catDiv.appendChild(btn);
+      });
+      AOS.refresh();
+    }
+
+    async function loadQuestions(catId) {
+      const res = await fetch(`http://127.0.0.1:8080/questions/${catId}`);
+      const data = await res.json();
+      const catDiv = document.getElementById("categories");
+      catDiv.innerHTML = `<h3 data-aos="fade-right">질문 목록 📋</h3>`;
+      data.questions.forEach(q => {
+        const btn = document.createElement("button");
+        btn.textContent = q.question;
+        btn.onclick = () => loadAnswer(q.id);
+        catDiv.appendChild(btn);
+      });
+      AOS.refresh();
+    }
+
+    async function loadAnswer(qId) {
+      const res = await fetch(`http://127.0.0.1:8080/answer/${qId}`);
+      const data = await res.json();
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `<h3 data-aos="fade-down">답변 💬</h3><p data-aos="fade-up">${data.answer}</p>`;
+      AOS.refresh();
+    }
+  </script>
+</body>
+</html>
