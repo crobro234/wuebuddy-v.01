@@ -130,7 +130,21 @@
 </head>
 <body>
 
-  <!-- 🎬 인트로 -->
+  <!-- 🎬 인트로 1~4 -->
+  <section id="intro1">
+    <h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1>
+  </section>
+
+  <section id="intro2">
+    <h1 data-aos="fade-right">🎓 그런데 뷔르츠부르크로 오신다고요?</h1>
+    <p data-aos="fade-left" data-aos-delay="200">새로운 나라, 새로운 대학... 준비할 게 너무 많죠.</p>
+  </section>
+
+  <section id="intro3">
+    <h1 data-aos="fade-left">📚 어디서부터 알아봐야 할지 막막하다면,</h1>
+    <p data-aos="fade-right" data-aos-delay="200">뷔르츠부르크 경험자가 직접 만든 가이드가 도와드릴게요.</p>
+  </section>
+
   <section id="intro4">
     <h1 data-aos="zoom-in">✨ WueBuddy</h1>
     <p data-aos="fade-up" data-aos-delay="200">당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.</p>
@@ -160,29 +174,40 @@
     }
 
     async function loadBoards() {
-      loadQuestionPreview();
+      await loadQuestionPreview();
       loadCampusPreview();
       loadFoodPreview();
     }
 
-    // 📋 질문 게시판 미리보기
+    // 📋 질문 랜덤 미리보기
     async function loadQuestionPreview() {
+      const board = document.getElementById("question-board");
+      board.innerHTML = "<p>질문 불러오는 중...</p>";
       try {
-        const res = await fetch(`${API_BASE}/all_questions`);
-        const data = await res.json();
-        const questions = shuffleArray(data.questions).slice(0, 3);
+        const catRes = await fetch(`${API_BASE}/categories`);
+        const catData = await catRes.json();
+        const questions = [];
 
-        const board = document.getElementById("question-board");
+        // 모든 카테고리에서 질문 수집
+        for (let c of catData.categories) {
+          const res = await fetch(`${API_BASE}/questions/${c.id}`);
+          const data = await res.json();
+          questions.push(...data.questions);
+        }
+
+        if (questions.length === 0) throw new Error();
+
+        const preview = shuffleArray(questions).slice(0, 3);
         board.innerHTML = `
           <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
-          <ul>${questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
+          <ul>${preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
         `;
       } catch {
-        document.getElementById("question-board").innerHTML = "<p>질문을 불러올 수 없습니다.</p>";
+        board.innerHTML = "<p>❌ 질문을 불러올 수 없습니다.</p>";
       }
     }
 
-    // 🏫 캠퍼스맵 미리보기
+    // 🏫 캠퍼스맵
     function loadCampusPreview() {
       const buildings = [
         { id: 1, name: "Z6 (Hubland Informatik)", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Z6+Hubland+Informatik+Würzburg" },
@@ -190,27 +215,28 @@
         { id: 3, name: "Zentralbibliothek", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Zentralbibliothek+Universität+Würzburg" },
         { id: 4, name: "Sprachenzentrum", address: "Am Hubland Nord 12, 97074 Würzburg", link: "https://www.google.com/maps?q=Sprachenzentrum+Universität+Würzburg" }
       ];
+      window._buildings = buildings;
       const preview = shuffleArray(buildings).slice(0, 2);
       const board = document.getElementById("campus-board");
       board.innerHTML = `
         <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">더 보기</span></h2>
         <ul>${preview.map(b => `<li onclick="showBuilding(${b.id})">${b.name}</li>`).join("")}</ul>
       `;
-      window._buildings = buildings;
     }
 
-    // 🍽️ 맛집 미리보기
+    // 🍽️ 맛집
     function loadFoodPreview() {
       const foods = [
         { id: 1, name: "Berlin Döner", address: "Domstraße 3, 97070 Würzburg", link: "https://www.google.com/maps?q=Berlin+Döner+Domstraße+3+97070+Würzburg" },
         { id: 2, name: "L'Osteria Würzburg", address: "Röntgenring 3, 97070 Würzburg", link: "https://www.google.com/maps?q=L'Osteria+Würzburg+Röntgenring+3+97070+Würzburg" }
       ];
+      window._foods = foods;
+      const preview = shuffleArray(foods).slice(0, 2);
       const board = document.getElementById("food-board");
       board.innerHTML = `
         <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">더 보기</span></h2>
-        <ul>${shuffleArray(foods).slice(0, 2).map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>
+        <ul>${preview.map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>
       `;
-      window._foods = foods;
     }
 
     async function loadAnswer(qId) {
@@ -233,20 +259,11 @@
     }
 
     function showCampusMap() {
-      const board = document.getElementById("campus-board");
       const b = window._buildings;
+      const board = document.getElementById("campus-board");
       board.innerHTML = `
         <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
         <ul>${b.map(x => `<li onclick="showBuilding(${x.id})">${x.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    function showFoodList() {
-      const board = document.getElementById("food-board");
-      const f = window._foods;
-      board.innerHTML = `
-        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
-        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
       `;
     }
 
@@ -262,6 +279,15 @@
       `;
     }
 
+    function showFoodList() {
+      const f = window._foods;
+      const board = document.getElementById("food-board");
+      board.innerHTML = `
+        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
+      `;
+    }
+
     function showFood(id) {
       const f = window._foods.find(x => x.id === id);
       const box = document.getElementById("answer-box");
@@ -274,12 +300,10 @@
       `;
     }
 
-    // 랜덤 섞기 함수
     function shuffleArray(arr) {
       return arr.sort(() => Math.random() - 0.5);
     }
 
-    // “더 보기” 클릭 시 전체 질문 목록 보기
     async function showAllQuestions() {
       const res = await fetch(`${API_BASE}/categories`);
       const data = await res.json();
