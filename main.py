@@ -65,6 +65,20 @@ def create_token(username: str):
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=6)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+# 회원가입
+@app.post("/register")
+def register(username: str = Form(...), email: str = Form(...), password: str = Form(...)):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE username=? OR email=?", (username, email))
+    if cur.fetchone():
+        raise HTTPException(status_code=400, detail="이미 존재하는 사용자입니다.")
+    pw_hash = hash_password(password)
+    cur.execute("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+                (username, email, pw_hash))
+    conn.commit()
+    conn.close()
+    return {"message": "✅ 회원가입 완료!"}
 
 # -------------------- 회원가입 --------------------
 @app.post("/register")
