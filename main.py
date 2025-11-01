@@ -7,7 +7,7 @@ import jwt, datetime
 
 app = FastAPI()
 
-# CORS 허용 (프론트엔드와 통신)
+# -------------------- CORS 설정 --------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 정적 파일 (index.html 서빙)
+# -------------------- 정적 파일 서빙 --------------------
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 DB_PATH = "data/exchange_helper.db"
@@ -28,31 +28,39 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    # 기존 categories, questions 테이블
-    cur.execute("""CREATE TABLE IF NOT EXISTS categories (
+    # 기본 테이블들 생성
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT)""")
-    cur.execute("""CREATE TABLE IF NOT EXISTS questions (
+        name TEXT
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         category_id INTEGER,
         question TEXT,
         answer TEXT,
-        FOREIGN KEY (category_id) REFERENCES categories(id))""")
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+    )
+    """)
 
-    # ✅ users 테이블 추가
-    cur.execute("""CREATE TABLE IF NOT EXISTS users (
+    # ✅ users 테이블 생성
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         email TEXT UNIQUE,
         password_hash TEXT
-    )""")
+    )
+    """)
 
     conn.commit()
     conn.close()
 
 init_db()
 
-# -------------------- 보안 함수 --------------------
+# -------------------- 비밀번호 및 토큰 관련 함수 --------------------
 def hash_password(password: str):
     return pwd_context.hash(password)
 
@@ -65,20 +73,6 @@ def create_token(username: str):
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=6)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-# 회원가입
-@app.post("/register")
-def register(username: str = Form(...), email: str = Form(...), password: str = Form(...)):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE username=? OR email=?", (username, email))
-    if cur.fetchone():
-        raise HTTPException(status_code=400, detail="이미 존재하는 사용자입니다.")
-    pw_hash = hash_password(password)
-    cur.execute("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
-                (username, email, pw_hash))
-    conn.commit()
-    conn.close()
-    return {"message": "✅ 회원가입 완료!"}
 
 # -------------------- 회원가입 --------------------
 @app.post("/register")
@@ -89,7 +83,10 @@ def register(username: str = Form(...), email: str = Form(...), password: str = 
     if cur.fetchone():
         raise HTTPException(status_code=400, detail="이미 존재하는 사용자입니다.")
     pw_hash = hash_password(password)
-    cur.execute("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)", (username, email, pw_hash))
+    cur.execute(
+        "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+        (username, email, pw_hash)
+    )
     conn.commit()
     conn.close()
     return {"message": "✅ 회원가입 완료!"}
@@ -107,7 +104,7 @@ def login(username: str = Form(...), password: str = Form(...)):
     token = create_token(username)
     return {"message": "로그인 성공", "token": token}
 
-# -------------------- (선택) 내 정보 확인 --------------------
+# -------------------- 내 정보 확인 --------------------
 @app.get("/me")
 def me(request: Request):
     token = request.headers.get("Authorization")
@@ -121,7 +118,7 @@ def me(request: Request):
         raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
     return {"username": username}
 
-# -------------------- 기존 Q&A API --------------------
+# -------------------- Q&A 카테고리 --------------------
 @app.get("/categories")
 def get_categories():
     conn = sqlite3.connect(DB_PATH)
@@ -131,6 +128,7 @@ def get_categories():
     conn.close()
     return {"categories": [{"id": r[0], "name": r[1]} for r in rows]}
 
+# -------------------- Q&A 질문 목록 --------------------
 @app.get("/questions/{category_id}")
 def get_questions(category_id: int):
     conn = sqlite3.connect(DB_PATH)
@@ -140,6 +138,7 @@ def get_questions(category_id: int):
     conn.close()
     return {"questions": [{"id": r[0], "question": r[1]} for r in rows]}
 
+# -------------------- Q&A 답변 --------------------
 @app.get("/answer/{question_id}")
 def get_answer(question_id: int):
     conn = sqlite3.connect(DB_PATH)
@@ -151,3 +150,8 @@ def get_answer(question_id: int):
         return {"answer": row[0]}
     else:
         raise HTTPException(status_code=404, detail="질문을 찾을 수 없습니다.")
+
+
+# -------------------- 서버 실행 시 메시지 --------------------
+if __name__ == "__main__":
+    print("✅ FastAPI 서버가 준비되었습니다. (회원가입 + 로그인 + Q&A 포함)")
