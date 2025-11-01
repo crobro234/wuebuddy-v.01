@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 # -------------------- 정적 파일 서빙 --------------------
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 DB_PATH = "data/exchange_helper.db"
 SECRET_KEY = "super_secret_key"
