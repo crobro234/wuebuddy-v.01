@@ -169,6 +169,13 @@
       <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
     </div>
 
+    <!-- 🥗 Mensa 식단 추가 -->
+    <div id="mensa-board" class="board" data-aos="fade-up">
+      <h2>🥗 Mensa 식단</h2>
+      <p style="font-size:1em; color:#333;">오늘의 메뉴를 확인하세요.</p>
+      <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
+    </div>
+
     <div id="food-board" class="board" data-aos="fade-up"></div>
     <div id="answer-box" data-aos="fade-up"></div>
   </div>
@@ -260,6 +267,11 @@
       document.getElementById("campus-map-view").style.display = "none";
       document.getElementById("campus-board").style.display = "block";
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ✅ Mensa 식단 열기
+    function openMensa() {
+      window.open("https://www.studentenwerk-wuerzburg.de/mensen/wuerzburg/mensa-am-hubland.html", "_blank");
     }
 
     async function loadAnswer(qId) {
