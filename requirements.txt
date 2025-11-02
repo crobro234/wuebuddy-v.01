@@ -3,3 +3,4 @@ uvicorn
 passlib[bcrypt]
 pyjwt
 python-multipart
+openai
