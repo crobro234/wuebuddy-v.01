@@ -4,3 +4,4 @@ passlib[bcrypt]
 pyjwt
 python-multipart
 openai
+numpy
