@@ -13,57 +13,17 @@
       scroll-behavior: smooth;
       background-color: #f7f8fa;
     }
-
-    section {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: white;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
-
-    section::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-    }
-
-    section > * { position: relative; z-index: 1; }
-
-    h1 { font-size: 2.8em; margin-bottom: 0.4em; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
-    p { font-size: 1.3em; max-width: 800px; line-height: 1.6; }
-
     .btn {
-      margin-top: 20px;
+      margin-top: 10px;
       background-color: #0066ff;
       border: none;
       color: white;
-      padding: 12px 25px;
-      font-size: 1em;
+      padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
       transition: 0.2s;
     }
     .btn:hover { background-color: #004bcc; }
-
-    #intro1 { background-image: url('https://images.unsplash.com/photo-1559305616-3f99c7779865?auto=format&fit=crop&w=1600&q=80'); }
-    #intro2 { background-image: url('https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=1600&q=80'); }
-    #intro3 { background-image: url('https://images.unsplash.com/photo-1532948488455-68dabc39f023?auto=format&fit=crop&w=1600&q=80'); }
-    #intro4 { background-image: url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1600&q=80'); }
-
-    #mainContent {
-      display: none;
-      min-height: 100vh;
-      padding: 40px 20px;
-      color: #222;
-    }
-
     .board {
       background: #fff;
       border-radius: 10px;
@@ -72,266 +32,106 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease;
     }
-
-    .board h2 {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #004bcc;
-      font-size: 1.4em;
-      margin-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 6px;
-    }
-
-    .board ul {
-      list-style: none;
-      text-align: left;
-    }
-
-    .board li {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .board li:hover {
-      background: #f2f4ff;
-      padding-left: 10px;
-    }
-
-    #answer-box {
-      margin-top: 40px;
-      padding: 25px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.95);
-      color: #333;
-      width: 70%;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      display: none;
-    }
-
-    a.map-link {
-      color: #004bcc;
-      font-weight: bold;
-      text-decoration: none;
-    }
-    a.map-link:hover { text-decoration: underline; }
-
-    iframe {
-      border: none;
-      border-radius: 12px;
-      width: 100%;
-      height: 600px;
-      margin-top: 10px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .board h2 { color: #004bcc; margin-bottom: 10px; }
+    a.map-link { color: #004bcc; font-weight: bold; text-decoration: none; }
   </style>
 </head>
 <body>
-
-  <!-- 🎬 인트로 1~4 -->
-  <section id="intro1">
-    <h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1>
-  </section>
-
-  <section id="intro2">
-    <h1 data-aos="fade-right">🎓 그런데 뷔르츠부르크로 오신다고요?</h1>
-    <p data-aos="fade-left" data-aos-delay="200">새로운 나라, 새로운 대학... 준비할 게 너무 많죠.</p>
-  </section>
-
-  <section id="intro3">
-    <h1 data-aos="fade-left">📚 어디서부터 알아봐야 할지 막막하다면,</h1>
-    <p data-aos="fade-right" data-aos-delay="200">뷔르츠부르크 경험자가 직접 만든 가이드가 도와드릴게요.</p>
-  </section>
-
   <section id="intro4">
-    <h1 data-aos="zoom-in">✨ WueBuddy</h1>
-    <p data-aos="fade-up" data-aos-delay="200">당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.</p>
-    <button class="btn" data-aos="fade-up" data-aos-delay="400" onclick="showMain()">시작하기 🚀</button>
+    <h1>✨ WueBuddy</h1>
+    <button class="btn" onclick="showMain()">시작하기 🚀</button>
   </section>
 
-  <!-- 💬 게시판 메인 -->
-  <div id="mainContent" data-aos="fade-in">
-    <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
+  <div id="mainContent" style="display:none; padding:20px;">
+    <h2 style="text-align:center; color:#333;">📚 WueBuddy 게시판</h2>
 
-    <div id="question-board" class="board" data-aos="fade-up"></div>
-    <div id="campus-board" class="board" data-aos="fade-up"></div>
+    <!-- 🔍 검색 기능 추가된 질문 보드 -->
+    <div id="question-board" class="board">
+      <h2>📋 질문 게시판</h2>
+      <div style="display:flex; gap:8px; margin:10px 0;">
+        <input id="q-search" placeholder="예: 비자, Anmeldung, Aufenthaltstitel..." style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
+        <button class="btn" onclick="semanticSearch()">유사검색</button>
+      </div>
+      <div id="q-preview"></div>
+    </div>
 
-    <!-- 🥗 Mensa 식단 (토글 방식) -->
-    <div id="mensa-board" class="board" data-aos="fade-up">
-      <h2>🥗 Mensa 식단 (Hubland Süd)</h2>
-      <p style="font-size:1em; color:#333;">버튼을 눌러 오늘의 메뉴를 확인하세요.</p>
-      <button class="btn" onclick="toggleMensa()">Mensa 식단 보기 🍽️</button>
+    <!-- 캠퍼스맵 -->
+    <div id="campus-board" class="board"></div>
 
-      <div id="mensa-frame" style="display:none;">
-        <iframe 
-          src="https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu">
-        </iframe>
-        <button class="btn" onclick="toggleMensa()">← 닫기</button>
+    <!-- Mensa 식단 -->
+    <div id="mensa-board" class="board">
+      <h2>🥗 Mensa 식단</h2>
+      <button class="btn" onclick="toggleMensa()">멘자 식단 보기 🍽️</button>
+      <div id="mensa-view" style="display:none; margin-top:10px;">
+        <iframe src="https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu"
+                width="100%" height="600" style="border:0; border-radius:12px;"></iframe>
       </div>
     </div>
 
-    <div id="food-board" class="board" data-aos="fade-up"></div>
-    <div id="answer-box" data-aos="fade-up"></div>
+    <div id="food-board" class="board"></div>
+    <div id="answer-box" class="board" style="display:none;"></div>
   </div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    AOS.init({ duration: 1000, once: true });
     const API_BASE = window.location.origin;
 
     function showMain() {
-      document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
-      const main = document.getElementById("mainContent");
-      main.style.display = "block";
-      loadBoards();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function loadBoards() {
-      await loadQuestionPreview();
-      loadCampusPreview();
-      loadFoodPreview();
-    }
-
-    // ✅ Mensa 토글 기능
-    function toggleMensa() {
-      const frame = document.getElementById("mensa-frame");
-      frame.style.display = frame.style.display === "none" ? "block" : "none";
+      document.getElementById("intro4").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      loadQuestionPreview();
     }
 
     async function loadQuestionPreview() {
-      const board = document.getElementById("question-board");
-      board.innerHTML = "<p>질문 불러오는 중...</p>";
+      const box = document.getElementById("q-preview");
+      box.innerHTML = "<p>질문 불러오는 중...</p>";
+      const res = await fetch(`${API_BASE}/categories`);
+      const data = await res.json();
+      const all = [];
+      for (let c of data.categories) {
+        const q = await fetch(`${API_BASE}/questions/${c.id}`);
+        const d = await q.json();
+        all.push(...d.questions);
+      }
+      box.innerHTML = `<ul>${all.slice(0,3).map(q=>`<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>`;
+    }
+
+    async function semanticSearch() {
+      const q = document.getElementById("q-search").value.trim();
+      if (!q) return alert("검색어를 입력하세요!");
+      const box = document.getElementById("q-preview");
+      box.innerHTML = "<p>🔍 의미검색 중...</p>";
+
       try {
-        const catRes = await fetch(`${API_BASE}/categories`);
-        const catData = await catRes.json();
-        const questions = [];
-        for (let c of catData.categories) {
-          const res = await fetch(`${API_BASE}/questions/${c.id}`);
-          const data = await res.json();
-          questions.push(...data.questions);
+        const res = await fetch(`${API_BASE}/search/semantic?query=`+encodeURIComponent(q));
+        const data = await res.json();
+        if (!data.results || !data.results.length) {
+          box.innerHTML = "<p>검색 결과가 없습니다.</p>";
+          return;
         }
-        const preview = shuffleArray(questions).slice(0, 3);
-        board.innerHTML = `
-          <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
-          <ul>${preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
-        `;
+        box.innerHTML = `<ul>${data.results.map(r=>`
+          <li onclick="loadAnswer(${r.id})">${r.question} <small style="color:#888;">(${r.score})</small></li>
+        `).join("")}</ul>`;
       } catch {
-        board.innerHTML = "<p>❌ 질문을 불러올 수 없습니다.</p>";
+        box.innerHTML = "<p>검색 오류 발생.</p>";
       }
     }
 
-    function loadCampusPreview() {
-      const buildings = [
-        { id: 1, name: "Z6 (Hubland Informatik)", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Z6+Hubland+Informatik+Würzburg" },
-        { id: 2, name: "Hubland Mensa", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Hubland+Mensa+Würzburg" },
-        { id: 3, name: "Zentralbibliothek", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Zentralbibliothek+Universität+Würzburg" },
-        { id: 4, name: "Sprachenzentrum", address: "Am Hubland Nord 12, 97074 Würzburg", link: "https://www.google.com/maps?q=Sprachenzentrum+Universität+Würzburg" }
-      ];
-      window._buildings = buildings;
-      const preview = shuffleArray(buildings).slice(0, 2);
-      const board = document.getElementById("campus-board");
-      board.innerHTML = `
-        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">더 보기</span></h2>
-        <ul>${preview.map(b => `<li onclick="showBuilding(${b.id})">${b.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    function loadFoodPreview() {
-      const foods = [
-        { id: 1, name: "Berlin Döner", address: "Domstraße 3, 97070 Würzburg", link: "https://www.google.com/maps?q=Berlin+Döner+Domstraße+3+97070+Würzburg" },
-        { id: 2, name: "L'Osteria Würzburg", address: "Röntgenring 3, 97070 Würzburg", link: "https://www.google.com/maps?q=L'Osteria+Würzburg+Röntgenring+3+97070+Würzburg" }
-      ];
-      window._foods = foods;
-      const preview = shuffleArray(foods).slice(0, 2);
-      const board = document.getElementById("food-board");
-      board.innerHTML = `
-        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">더 보기</span></h2>
-        <ul>${preview.map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    // 공통 기능들
-    function showCampusMap() {
-      const b = window._buildings;
-      const board = document.getElementById("campus-board");
-      board.innerHTML = `
-        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
-        <ul>${b.map(x => `<li onclick="showBuilding(${x.id})">${x.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    function showBuilding(id) {
-      const b = window._buildings.find(x => x.id === id);
+    async function loadAnswer(id) {
+      const res = await fetch(`${API_BASE}/answer/${id}`);
+      const data = await res.json();
       const box = document.getElementById("answer-box");
       box.style.display = "block";
-      box.innerHTML = `
-        <h3>${b.name}</h3>
-        <p>📍 ${b.address}</p>
-        <p><a class="map-link" href="${b.link}" target="_blank">Google Maps로 보기 🔗</a></p>
-        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
-      `;
+      box.innerHTML = `<h3>💬 답변</h3><p>${data.answer}</p><button class="btn" onclick="back()">← 돌아가기</button>`;
     }
 
-    function showFoodList() {
-      const f = window._foods;
-      const board = document.getElementById("food-board");
-      board.innerHTML = `
-        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
-        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    function showFood(id) {
-      const f = window._foods.find(x => x.id === id);
-      const box = document.getElementById("answer-box");
-      box.style.display = "block";
-      box.innerHTML = `
-        <h3>${f.name}</h3>
-        <p>📍 ${f.address}</p>
-        <p><a class="map-link" href="${f.link}" target="_blank">Google Maps로 보기 🔗</a></p>
-        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
-      `;
-    }
-
-    function backToHome() {
+    function back() {
       document.getElementById("answer-box").style.display = "none";
-      loadBoards();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      loadQuestionPreview();
     }
 
-    function shuffleArray(arr) {
-      return arr.sort(() => Math.random() - 0.5);
-    }
-
-    async function showAllQuestions() {
-      const res = await fetch(`${API_BASE}/categories`);
-      const data = await res.json();
-      const board = document.getElementById("question-board");
-      board.innerHTML = `
-        <h2>📋 질문 카테고리 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
-        <ul>${data.categories.map(c => `<li onclick="loadQuestions(${c.id})">${c.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    async function loadQuestions(catId) {
-      const res = await fetch(`${API_BASE}/questions/${catId}`);
-      const data = await res.json();
-      const board = document.getElementById("question-board");
-      board.innerHTML = `
-        <h2>📋 질문 목록 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">← 뒤로</span></h2>
-        <ul>${data.questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
-      `;
+    function toggleMensa() {
+      const v = document.getElementById("mensa-view");
+      v.style.display = v.style.display === "none" ? "block" : "none";
     }
   </script>
 </body>
