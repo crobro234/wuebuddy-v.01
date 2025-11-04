@@ -13,17 +13,57 @@
       scroll-behavior: smooth;
       background-color: #f7f8fa;
     }
+
+    section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+    }
+
+    section > * { position: relative; z-index: 1; }
+
+    h1 { font-size: 2.8em; margin-bottom: 0.4em; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+    p { font-size: 1.3em; max-width: 800px; line-height: 1.6; }
+
     .btn {
-      margin-top: 10px;
+      margin-top: 40px;
       background-color: #0066ff;
       border: none;
       color: white;
-      padding: 10px 20px;
+      padding: 15px 30px;
+      font-size: 1.1em;
       border-radius: 8px;
       cursor: pointer;
       transition: 0.2s;
     }
     .btn:hover { background-color: #004bcc; }
+
+    #intro1 { background-image: url('https://images.unsplash.com/photo-1559305616-3f99c7779865?auto=format&fit=crop&w=1600&q=80'); }
+    #intro2 { background-image: url('https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=1600&q=80'); }
+    #intro3 { background-image: url('https://images.unsplash.com/photo-1532948488455-68dabc39f023?auto=format&fit=crop&w=1600&q=80'); }
+    #intro4 { background-image: url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1600&q=80'); }
+
+    #mainContent {
+      display: none;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #222;
+    }
+
     .board {
       background: #fff;
       border-radius: 10px;
@@ -32,106 +72,227 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease;
     }
-    .board h2 { color: #004bcc; margin-bottom: 10px; }
-    a.map-link { color: #004bcc; font-weight: bold; text-decoration: none; }
+
+    .board h2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #004bcc;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 6px;
+    }
+
+    .search-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-box input {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .board ul {
+      list-style: none;
+      text-align: left;
+    }
+
+    .board li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .board li:hover {
+      background: #f2f4ff;
+      padding-left: 10px;
+    }
+
+    #answer-box {
+      margin-top: 40px;
+      padding: 25px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.95);
+      color: #333;
+      width: 70%;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: none;
+    }
+
+    a.map-link {
+      color: #004bcc;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    a.map-link:hover { text-decoration: underline; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <section id="intro4">
-    <h1>✨ WueBuddy</h1>
-    <button class="btn" onclick="showMain()">시작하기 🚀</button>
+
+  <!-- 🎬 인트로 1~4 -->
+  <section id="intro1">
+    <h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1>
   </section>
 
-  <div id="mainContent" style="display:none; padding:20px;">
-    <h2 style="text-align:center; color:#333;">📚 WueBuddy 게시판</h2>
+  <section id="intro2">
+    <h1 data-aos="fade-right">🎓 그런데 뷔르츠부르크로 오신다고요?</h1>
+    <p data-aos="fade-left" data-aos-delay="200">새로운 나라, 새로운 대학... 준비할 게 너무 많죠.</p>
+  </section>
 
-    <!-- 🔍 검색 기능 추가된 질문 보드 -->
-    <div id="question-board" class="board">
-      <h2>📋 질문 게시판</h2>
-      <div style="display:flex; gap:8px; margin:10px 0;">
-        <input id="q-search" placeholder="예: 비자, Anmeldung, Aufenthaltstitel..." style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
-        <button class="btn" onclick="semanticSearch()">유사검색</button>
+  <section id="intro3">
+    <h1 data-aos="fade-left">📚 어디서부터 알아봐야 할지 막막하다면,</h1>
+    <p data-aos="fade-right" data-aos-delay="200">뷔르츠부르크 경험자가 직접 만든 가이드가 도와드릴게요.</p>
+  </section>
+
+  <section id="intro4">
+    <h1 data-aos="zoom-in">✨ WueBuddy</h1>
+    <p data-aos="fade-up" data-aos-delay="200">당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.</p>
+    <button class="btn" data-aos="fade-up" data-aos-delay="400" onclick="showMain()">시작하기 🚀</button>
+  </section>
+
+  <!-- 💬 메인 컨텐츠 -->
+  <div id="mainContent" data-aos="fade-in">
+    <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
+
+    <!-- 🧭 검색 기능 추가 -->
+    <div id="question-board" class="board" data-aos="fade-up">
+      <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
+      <div class="search-box">
+        <input id="searchInput" type="text" placeholder="검색어를 입력하세요...">
+        <button class="btn" style="margin-top:0;" onclick="searchQuestions()">검색 🔍</button>
       </div>
-      <div id="q-preview"></div>
+      <ul id="questionList"></ul>
     </div>
 
-    <!-- 캠퍼스맵 -->
-    <div id="campus-board" class="board"></div>
+    <div id="campus-board" class="board" data-aos="fade-up"></div>
 
-    <!-- Mensa 식단 -->
-    <div id="mensa-board" class="board">
+    <!-- 지도 -->
+    <div id="campus-map-view" style="display:none; text-align:center; margin-top:20px;">
+      <h2>🏫 WueBuddy 캠퍼스 지도</h2>
+      <iframe id="mapFrame"
+        src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
+        width="90%" height="600"
+        style="border-radius:12px; border:0; margin-top:10px;">
+      </iframe>
+      <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
+    </div>
+
+    <!-- 멘자 식단 -->
+    <div id="mensa-board" class="board" data-aos="fade-up">
       <h2>🥗 Mensa 식단</h2>
-      <button class="btn" onclick="toggleMensa()">멘자 식단 보기 🍽️</button>
-      <div id="mensa-view" style="display:none; margin-top:10px;">
-        <iframe src="https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu"
-                width="100%" height="600" style="border:0; border-radius:12px;"></iframe>
-      </div>
+      <p style="font-size:1em; color:#333;">오늘의 메뉴를 확인하세요.</p>
+      <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
     </div>
 
-    <div id="food-board" class="board"></div>
-    <div id="answer-box" class="board" style="display:none;"></div>
+    <!-- 맛집 -->
+    <div id="food-board" class="board" data-aos="fade-up"></div>
+
+    <div id="answer-box" data-aos="fade-up"></div>
   </div>
 
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
+    AOS.init({ duration: 1000, once: true });
     const API_BASE = window.location.origin;
 
     function showMain() {
-      document.getElementById("intro4").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-      loadQuestionPreview();
+      document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
+      const main = document.getElementById("mainContent");
+      main.style.display = "block";
+      loadBoards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    async function loadBoards() {
+      await loadQuestionPreview();
+      loadCampusPreview();
+      loadFoodPreview();
+    }
+
+    // 질문 미리보기
     async function loadQuestionPreview() {
-      const box = document.getElementById("q-preview");
-      box.innerHTML = "<p>질문 불러오는 중...</p>";
-      const res = await fetch(`${API_BASE}/categories`);
-      const data = await res.json();
-      const all = [];
-      for (let c of data.categories) {
-        const q = await fetch(`${API_BASE}/questions/${c.id}`);
-        const d = await q.json();
-        all.push(...d.questions);
-      }
-      box.innerHTML = `<ul>${all.slice(0,3).map(q=>`<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>`;
-    }
-
-    async function semanticSearch() {
-      const q = document.getElementById("q-search").value.trim();
-      if (!q) return alert("검색어를 입력하세요!");
-      const box = document.getElementById("q-preview");
-      box.innerHTML = "<p>🔍 의미검색 중...</p>";
-
+      const board = document.getElementById("questionList");
+      board.innerHTML = "<p>질문 불러오는 중...</p>";
       try {
-        const res = await fetch(`${API_BASE}/search/semantic?query=`+encodeURIComponent(q));
-        const data = await res.json();
-        if (!data.results || !data.results.length) {
-          box.innerHTML = "<p>검색 결과가 없습니다.</p>";
-          return;
+        const catRes = await fetch(`${API_BASE}/categories`);
+        const catData = await catRes.json();
+        const questions = [];
+        for (let c of catData.categories) {
+          const res = await fetch(`${API_BASE}/questions/${c.id}`);
+          const data = await res.json();
+          questions.push(...data.questions);
         }
-        box.innerHTML = `<ul>${data.results.map(r=>`
-          <li onclick="loadAnswer(${r.id})">${r.question} <small style="color:#888;">(${r.score})</small></li>
-        `).join("")}</ul>`;
+        if (questions.length === 0) throw new Error();
+        window._questions = questions;
+        const preview = shuffleArray(questions).slice(0, 3);
+        board.innerHTML = preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("");
       } catch {
-        box.innerHTML = "<p>검색 오류 발생.</p>";
+        board.innerHTML = "<p>❌ 질문을 불러올 수 없습니다.</p>";
       }
     }
 
-    async function loadAnswer(id) {
-      const res = await fetch(`${API_BASE}/answer/${id}`);
+    // 검색 기능
+    async function searchQuestions() {
+      const keyword = document.getElementById("searchInput").value.trim();
+      if (!keyword) return alert("검색어를 입력하세요!");
+      const board = document.getElementById("questionList");
+      board.innerHTML = "<p>검색 중...</p>";
+      try {
+        const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(keyword)}`);
+        const data = await res.json();
+        if (!data.results || data.results.length === 0) {
+          board.innerHTML = "<p>❌ 관련된 결과가 없습니다.</p>";
+        } else {
+          board.innerHTML = data.results.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("");
+        }
+      } catch {
+        board.innerHTML = "<p>⚠️ 검색 중 오류가 발생했습니다.</p>";
+      }
+    }
+
+    // 캠퍼스맵 등 기존 함수는 그대로 유지
+    function openMapView() {
+      document.getElementById("campus-board").style.display = "none";
+      document.getElementById("campus-map-view").style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function closeMapView() {
+      document.getElementById("campus-map-view").style.display = "none";
+      document.getElementById("campus-board").style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function openMensa() {
+      window.open("https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu", "_blank");
+    }
+    async function loadAnswer(qId) {
+      const res = await fetch(`${API_BASE}/answer/${qId}`);
       const data = await res.json();
       const box = document.getElementById("answer-box");
       box.style.display = "block";
-      box.innerHTML = `<h3>💬 답변</h3><p>${data.answer}</p><button class="btn" onclick="back()">← 돌아가기</button>`;
+      box.innerHTML = `<h3>답변 💬</h3><p>${data.answer}</p><button class="btn" onclick="backToHome()">처음으로 🔙</button>`;
     }
-
-    function back() {
+    function backToHome() {
       document.getElementById("answer-box").style.display = "none";
-      loadQuestionPreview();
+      loadBoards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    function toggleMensa() {
-      const v = document.getElementById("mensa-view");
-      v.style.display = v.style.display === "none" ? "block" : "none";
+    function shuffleArray(arr) {
+      return arr.sort(() => Math.random() - 0.5);
     }
   </script>
 </body>
