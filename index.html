@@ -126,6 +126,11 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    iframe {
+      border: none;
+      border-radius: 12px;
+    }
   </style>
 </head>
 <body>
@@ -154,26 +159,17 @@
   <!-- 💬 게시판 메인 -->
   <div id="mainContent" data-aos="fade-in">
     <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
+    
     <div id="question-board" class="board" data-aos="fade-up"></div>
     <div id="campus-board" class="board" data-aos="fade-up"></div>
-    
-    <!-- ✅ 지도로 보기 추가된 부분 -->
-    <div id="campus-map-view" style="display:none; text-align:center; margin-top:20px;">
-      <h2>🏫 WueBuddy 캠퍼스 지도</h2>
-      <iframe 
-        id="mapFrame"
-        src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
-        width="90%" height="600"
-        style="border-radius:12px; border:0; margin-top:10px;">
-      </iframe>
-      <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
-    </div>
 
-    <!-- 🥗 Mensa 식단 추가 -->
+    <!-- ✅ Hubland Süd Mensa 메뉴 바로 표시 -->
     <div id="mensa-board" class="board" data-aos="fade-up">
-      <h2>🥗 Mensa 식단</h2>
-      <p style="font-size:1em; color:#333;">오늘의 메뉴를 확인하세요.</p>
-      <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
+      <h2>🥗 Mensa 식단 (Hubland Süd)</h2>
+      <iframe 
+        src="https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued"
+        width="100%" height="600">
+      </iframe>
     </div>
 
     <div id="food-board" class="board" data-aos="fade-up"></div>
@@ -199,7 +195,6 @@
       loadFoodPreview();
     }
 
-    // 📋 질문 랜덤 미리보기
     async function loadQuestionPreview() {
       const board = document.getElementById("question-board");
       board.innerHTML = "<p>질문 불러오는 중...</p>";
@@ -212,7 +207,6 @@
           const data = await res.json();
           questions.push(...data.questions);
         }
-        if (questions.length === 0) throw new Error();
         const preview = shuffleArray(questions).slice(0, 3);
         board.innerHTML = `
           <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
@@ -223,7 +217,6 @@
       }
     }
 
-    // 🏫 캠퍼스맵
     function loadCampusPreview() {
       const buildings = [
         { id: 1, name: "Z6 (Hubland Informatik)", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Z6+Hubland+Informatik+Würzburg" },
@@ -237,11 +230,9 @@
       board.innerHTML = `
         <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">더 보기</span></h2>
         <ul>${preview.map(b => `<li onclick="showBuilding(${b.id})">${b.name}</li>`).join("")}</ul>
-        <button class="btn" style="margin-top:10px;" onclick="openMapView()">지도로 보기 🗺️</button>
       `;
     }
 
-    // 🍽️ 맛집
     function loadFoodPreview() {
       const foods = [
         { id: 1, name: "Berlin Döner", address: "Domstraße 3, 97070 Würzburg", link: "https://www.google.com/maps?q=Berlin+Döner+Domstraße+3+97070+Würzburg" },
@@ -254,43 +245,6 @@
         <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">더 보기</span></h2>
         <ul>${preview.map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>
       `;
-    }
-
-    // ✅ 지도 열기 / 닫기 함수
-    function openMapView() {
-      document.getElementById("campus-board").style.display = "none";
-      document.getElementById("campus-map-view").style.display = "block";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function closeMapView() {
-      document.getElementById("campus-map-view").style.display = "none";
-      document.getElementById("campus-board").style.display = "block";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // ✅ Mensa 식단 열기
-    function openMensa() {
-      window.open("https://www.stw-wuerzburg.de/mensen-cafeterien/mensa-am-hubland", "_blank");
-    }
-
-    async function loadAnswer(qId) {
-      const res = await fetch(`${API_BASE}/answer/${qId}`);
-      const data = await res.json();
-      const box = document.getElementById("answer-box");
-      box.style.display = "block";
-      box.innerHTML = `
-        <h3 data-aos="fade-down">답변 💬</h3>
-        <p data-aos="fade-up">${data.answer}</p>
-        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
-      `;
-      AOS.refresh();
-    }
-
-    function backToHome() {
-      document.getElementById("answer-box").style.display = "none";
-      loadBoards();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showCampusMap() {
@@ -335,6 +289,12 @@
       `;
     }
 
+    function backToHome() {
+      document.getElementById("answer-box").style.display = "none";
+      loadBoards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function shuffleArray(arr) {
       return arr.sort(() => Math.random() - 0.5);
     }
@@ -358,8 +318,6 @@
         <ul>${data.questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
       `;
     }
-
   </script>
 </body>
 </html>
-
