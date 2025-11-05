@@ -252,6 +252,106 @@
       document.getElementById("postForm").reset();
       loadPosts();
     }
+        /* 🔧 누락된 기존 함수 복구 */
+
+    function backToHome() {
+      document.getElementById("answer-box").style.display = "none";
+      loadBoards();
+      loadPosts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showCampusMap() {
+      const b = window._buildings;
+      const board = document.getElementById("campus-board");
+      board.innerHTML = `
+        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${b.map(x => `<li onclick="showBuilding(${x.id})">${x.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    function showBuilding(id) {
+      const b = window._buildings.find(x => x.id === id);
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `
+        <h3>${b.name}</h3>
+        <p>📍 ${b.address}</p>
+        <p><a class="map-link" href="${b.link}" target="_blank">Google Maps로 보기 🔗</a></p>
+        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+      `;
+    }
+
+    function openMapView() {
+      document.getElementById("campus-board").style.display = "none";
+      const mapView = document.createElement("div");
+      mapView.id = "campus-map-view";
+      mapView.innerHTML = `
+        <h2>🏫 WueBuddy 캠퍼스 지도</h2>
+        <iframe 
+          src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
+          width="90%" height="600"
+          style="border-radius:12px; border:0; margin-top:10px;">
+        </iframe>
+        <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
+      `;
+      document.getElementById("mainContent").appendChild(mapView);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeMapView() {
+      const mapView = document.getElementById("campus-map-view");
+      if (mapView) mapView.remove();
+      document.getElementById("campus-board").style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openMensa() {
+      window.open("https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu", "_blank");
+    }
+
+    function showFoodList() {
+      const f = window._foods;
+      const board = document.getElementById("food-board");
+      board.innerHTML = `
+        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    function showFood(id) {
+      const f = window._foods.find(x => x.id === id);
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `
+        <h3>${f.name}</h3>
+        <p>📍 ${f.address}</p>
+        <p><a class="map-link" href="${f.link}" target="_blank">Google Maps로 보기 🔗</a></p>
+        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+      `;
+    }
+
+    async function showAllQuestions() {
+      const res = await fetch(`${API_BASE}/categories`);
+      const data = await res.json();
+      const board = document.getElementById("question-board");
+      board.innerHTML = `
+        <h2>📋 질문 카테고리 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${data.categories.map(c => `<li onclick="loadQuestions(${c.id})">${c.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    async function loadQuestions(catId) {
+      const res = await fetch(`${API_BASE}/questions/${catId}`);
+      const data = await res.json();
+      const board = document.getElementById("question-board");
+      board.innerHTML = `
+        <h2>📋 질문 목록 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">← 뒤로</span></h2>
+        <ul>${data.questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
+      `;
+    }
+
   </script>
 </body>
 </html>
+
