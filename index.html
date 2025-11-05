@@ -52,6 +52,13 @@
     }
     .btn:hover { background-color: #004bcc; }
 
+    #mainContent {
+      display: none;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #222;
+    }
+
     .board {
       background: #fff;
       border-radius: 10px;
@@ -60,6 +67,26 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease;
     }
+
+    .board h2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #004bcc;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 6px;
+    }
+
+    .board ul { list-style: none; text-align: left; }
+    .board li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .board li:hover { background: #f2f4ff; padding-left: 10px; }
 
     #answer-box {
       margin-top: 40px;
@@ -82,16 +109,20 @@
   </style>
 </head>
 <body>
+  <!-- 기존 인트로 그대로 -->
+  <section id="intro1"><h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1></section>
+  <section id="intro2"><h1 data-aos="fade-right">🎓 그런데 뷔르츠부르크로 오신다고요?</h1></section>
+  <section id="intro3"><h1 data-aos="fade-left">📚 어디서부터 알아봐야 할지 막막하다면</h1></section>
   <section id="intro4">
-    <h1>✨ WueBuddy</h1>
-    <p>교환학생 생활을 도와주는 도우미 챗봇</p>
+    <h1 data-aos="zoom-in">✨ WueBuddy</h1>
+    <p data-aos="fade-up">당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.</p>
     <button class="btn" onclick="showMain()">시작하기 🚀</button>
   </section>
 
-  <div id="mainContent" data-aos="fade-in" style="display:none; padding:40px;">
+  <div id="mainContent" data-aos="fade-in">
     <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
 
-    <!-- 💬 AI 챗봇 -->
+    <!-- ✅ 새로 추가된 AI 챗봇 기능 -->
     <div id="chat-board" class="board" data-aos="fade-up">
       <h2>🤖 AI에게 물어보기</h2>
       <div style="display:flex; gap:10px; align-items:flex-start; margin-top:10px;">
@@ -101,7 +132,6 @@
 
       <div id="chat-answer" style="margin-top:15px; display:none;">
         <div id="chat-answer-text" style="text-align:left; white-space:pre-wrap; line-height:1.6;"></div>
-
         <details id="chat-context" style="margin-top:10px;">
           <summary style="cursor:pointer; color:#004bcc; font-weight:bold;">참고한 로컬 문맥 보기</summary>
           <ul id="chat-context-list" style="margin-top:8px;"></ul>
@@ -109,10 +139,24 @@
       </div>
     </div>
 
-    <!-- 기존 게시판 -->
+    <!-- 💬 기존 게시판들 그대로 -->
     <div id="question-board" class="board" data-aos="fade-up"></div>
     <div id="campus-board" class="board" data-aos="fade-up"></div>
+    <div id="mensa-board" class="board" data-aos="fade-up">
+      <h2>🥗 Mensa 식단</h2>
+      <p>오늘의 메뉴를 확인하세요.</p>
+      <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
+    </div>
     <div id="food-board" class="board" data-aos="fade-up"></div>
+
+    <div id="campus-map-view" style="display:none; text-align:center;">
+      <h2>🏫 캠퍼스 지도</h2>
+      <iframe 
+        src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
+        width="90%" height="600" style="border-radius:12px; border:0;"></iframe>
+      <button class="btn" onclick="closeMapView()">← 돌아가기</button>
+    </div>
+
     <div id="answer-box" data-aos="fade-up"></div>
   </div>
 
@@ -133,6 +177,7 @@
       loadFoodPreview();
     }
 
+    // ✅ 추가된 AI 챗봇 함수
     async function sendChat() {
       const input = document.getElementById("chat-input");
       const text = document.getElementById("chat-answer-text");
@@ -156,15 +201,25 @@
         text.innerText = data.answer || "답변을 생성하지 못했습니다.";
         const ctx = data.context || [];
         if (ctx.length === 0) ctxList.innerHTML = "<li>로컬 문맥 없음</li>";
-        else ctxList.innerHTML = ctx.map(c => `<li><strong>Q:</strong> ${escapeHtml(c.question)}<br><strong>A:</strong> ${escapeHtml(c.answer)}</li>`).join("");
+        else ctxList.innerHTML = ctx.map(c =>
+          `<li><strong>Q:</strong> ${escapeHtml(c.question)}<br><strong>A:</strong> ${escapeHtml(c.answer)}</li>`
+        ).join("");
       } catch (e) {
         text.innerText = "오류: " + e.message;
       }
     }
 
     function escapeHtml(s) {
-      return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\"","&quot;").replaceAll("'","&#039;");
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#039;");
     }
+
+    // 나머지 기존 함수들 (질문게시판, 캠퍼스맵, 멘자, 맛집 등) 그대로 유지
+    // ... (당신 기존 코드 내용 그대로)
   </script>
 </body>
 </html>
