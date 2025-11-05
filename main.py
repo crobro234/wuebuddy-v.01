@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException, Form
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import os
 from openai import OpenAI
 import numpy as np
+from datetime import datetime
 
 # ===============================
 #  초기 설정
@@ -43,7 +43,7 @@ def get_all_questions():
     return [{"id": r[0], "question": r[1], "answer": r[2]} for r in rows]
 
 # ===============================
-#  기존 API (그대로 유지)
+#  기존 API (유지)
 # ===============================
 @app.get("/categories")
 def get_categories():
@@ -119,6 +119,30 @@ def semantic_search(query: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ===============================
+#  ✍️ 자유게시판 기능 추가
+# ===============================
+@app.get("/posts")
+def get_posts():
+    """자유게시판 글 목록 불러오기"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, content, created_at FROM posts ORDER BY id DESC")
+    data = [{"id": r[0], "title": r[1], "content": r[2], "created_at": r[3]} for r in cur.fetchall()]
+    conn.close()
+    return {"posts": data}
+
+@app.post("/posts/new")
+def create_post(title: str = Form(...), content: str = Form(...)):
+    """새 게시글 작성"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO posts (title, content, created_at) VALUES (?, ?, ?)",
+                (title, content, datetime.now()))
+    conn.commit()
+    conn.close()
+    return JSONResponse({"message": "✅ 게시글이 등록되었습니다."})
 
 # ===============================
 #  실행 (로컬 테스트용)
