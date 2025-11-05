@@ -84,20 +84,6 @@
       padding-bottom: 6px;
     }
 
-    .search-box {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .search-box input {
-      width: 60%;
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
     .board ul {
       list-style: none;
       text-align: left;
@@ -165,26 +151,17 @@
     <button class="btn" data-aos="fade-up" data-aos-delay="400" onclick="showMain()">시작하기 🚀</button>
   </section>
 
-  <!-- 💬 메인 컨텐츠 -->
+  <!-- 💬 게시판 메인 -->
   <div id="mainContent" data-aos="fade-in">
     <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
-
-    <!-- 🧭 검색 기능 추가 -->
-    <div id="question-board" class="board" data-aos="fade-up">
-      <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
-      <div class="search-box">
-        <input id="searchInput" type="text" placeholder="검색어를 입력하세요...">
-        <button class="btn" style="margin-top:0;" onclick="searchQuestions()">검색 🔍</button>
-      </div>
-      <ul id="questionList"></ul>
-    </div>
-
+    <div id="question-board" class="board" data-aos="fade-up"></div>
     <div id="campus-board" class="board" data-aos="fade-up"></div>
 
-    <!-- 지도 -->
+    <!-- ✅ 캠퍼스 지도 -->
     <div id="campus-map-view" style="display:none; text-align:center; margin-top:20px;">
       <h2>🏫 WueBuddy 캠퍼스 지도</h2>
-      <iframe id="mapFrame"
+      <iframe 
+        id="mapFrame"
         src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
         width="90%" height="600"
         style="border-radius:12px; border:0; margin-top:10px;">
@@ -192,14 +169,14 @@
       <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
     </div>
 
-    <!-- 멘자 식단 -->
+    <!-- 🥗 Mensa 식단 -->
     <div id="mensa-board" class="board" data-aos="fade-up">
       <h2>🥗 Mensa 식단</h2>
       <p style="font-size:1em; color:#333;">오늘의 메뉴를 확인하세요.</p>
       <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
     </div>
 
-    <!-- 맛집 -->
+    <!-- 🍽️ 맛집 -->
     <div id="food-board" class="board" data-aos="fade-up"></div>
 
     <div id="answer-box" data-aos="fade-up"></div>
@@ -224,9 +201,9 @@
       loadFoodPreview();
     }
 
-    // 질문 미리보기
+    // 📋 질문 게시판
     async function loadQuestionPreview() {
-      const board = document.getElementById("questionList");
+      const board = document.getElementById("question-board");
       board.innerHTML = "<p>질문 불러오는 중...</p>";
       try {
         const catRes = await fetch(`${API_BASE}/categories`);
@@ -238,61 +215,151 @@
           questions.push(...data.questions);
         }
         if (questions.length === 0) throw new Error();
-        window._questions = questions;
         const preview = shuffleArray(questions).slice(0, 3);
-        board.innerHTML = preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("");
+        board.innerHTML = `
+          <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
+          <ul>${preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
+        `;
       } catch {
         board.innerHTML = "<p>❌ 질문을 불러올 수 없습니다.</p>";
       }
     }
 
-    // 검색 기능
-    async function searchQuestions() {
-      const keyword = document.getElementById("searchInput").value.trim();
-      if (!keyword) return alert("검색어를 입력하세요!");
-      const board = document.getElementById("questionList");
-      board.innerHTML = "<p>검색 중...</p>";
-      try {
-        const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(keyword)}`);
-        const data = await res.json();
-        if (!data.results || data.results.length === 0) {
-          board.innerHTML = "<p>❌ 관련된 결과가 없습니다.</p>";
-        } else {
-          board.innerHTML = data.results.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("");
-        }
-      } catch {
-        board.innerHTML = "<p>⚠️ 검색 중 오류가 발생했습니다.</p>";
-      }
+    // 🏫 캠퍼스 맵
+    function loadCampusPreview() {
+      const buildings = [
+        { id: 1, name: "Z6 (Hubland Informatik)", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Z6+Hubland+Informatik+Würzburg" },
+        { id: 2, name: "Hubland Mensa", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Hubland+Mensa+Würzburg" },
+        { id: 3, name: "Zentralbibliothek", address: "Am Hubland, 97074 Würzburg", link: "https://www.google.com/maps?q=Zentralbibliothek+Universität+Würzburg" },
+        { id: 4, name: "Sprachenzentrum", address: "Am Hubland Nord 12, 97074 Würzburg", link: "https://www.google.com/maps?q=Sprachenzentrum+Universität+Würzburg" }
+      ];
+      window._buildings = buildings;
+      const preview = shuffleArray(buildings).slice(0, 2);
+      const board = document.getElementById("campus-board");
+      board.innerHTML = `
+        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">더 보기</span></h2>
+        <ul>${preview.map(b => `<li onclick="showBuilding(${b.id})">${b.name}</li>`).join("")}</ul>
+        <button class="btn" style="margin-top:10px;" onclick="openMapView()">지도로 보기 🗺️</button>
+      `;
     }
 
-    // 캠퍼스맵 등 기존 함수는 그대로 유지
+    // 🍴 맛집 추천
+    function loadFoodPreview() {
+      const foods = [
+        { id: 1, name: "Berlin Döner", address: "Domstraße 3, 97070 Würzburg", link: "https://www.google.com/maps?q=Berlin+Döner+Domstraße+3+97070+Würzburg" },
+        { id: 2, name: "L'Osteria Würzburg", address: "Röntgenring 3, 97070 Würzburg", link: "https://www.google.com/maps?q=L'Osteria+Würzburg+Röntgenring+3+97070+Würzburg" }
+      ];
+      window._foods = foods;
+      const preview = shuffleArray(foods).slice(0, 2);
+      const board = document.getElementById("food-board");
+      board.innerHTML = `
+        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">더 보기</span></h2>
+        <ul>${preview.map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    // 지도 보기
     function openMapView() {
       document.getElementById("campus-board").style.display = "none";
       document.getElementById("campus-map-view").style.display = "block";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function closeMapView() {
       document.getElementById("campus-map-view").style.display = "none";
       document.getElementById("campus-board").style.display = "block";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // 멘자 식단
     function openMensa() {
       window.open("https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu", "_blank");
     }
+
+    // 질문 상세
     async function loadAnswer(qId) {
       const res = await fetch(`${API_BASE}/answer/${qId}`);
       const data = await res.json();
       const box = document.getElementById("answer-box");
       box.style.display = "block";
-      box.innerHTML = `<h3>답변 💬</h3><p>${data.answer}</p><button class="btn" onclick="backToHome()">처음으로 🔙</button>`;
+      box.innerHTML = `
+        <h3 data-aos="fade-down">답변 💬</h3>
+        <p data-aos="fade-up">${data.answer}</p>
+        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+      `;
+      AOS.refresh();
     }
+
     function backToHome() {
       document.getElementById("answer-box").style.display = "none";
       loadBoards();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    function showCampusMap() {
+      const b = window._buildings;
+      const board = document.getElementById("campus-board");
+      board.innerHTML = `
+        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${b.map(x => `<li onclick="showBuilding(${x.id})">${x.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    function showBuilding(id) {
+      const b = window._buildings.find(x => x.id === id);
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `
+        <h3>${b.name}</h3>
+        <p>📍 ${b.address}</p>
+        <p><a class="map-link" href="${b.link}" target="_blank">Google Maps로 보기 🔗</a></p>
+        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+      `;
+    }
+
+    function showFoodList() {
+      const f = window._foods;
+      const board = document.getElementById("food-board");
+      board.innerHTML = `
+        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    function showFood(id) {
+      const f = window._foods.find(x => x.id === id);
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `
+        <h3>${f.name}</h3>
+        <p>📍 ${f.address}</p>
+        <p><a class="map-link" href="${f.link}" target="_blank">Google Maps로 보기 🔗</a></p>
+        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+      `;
+    }
+
     function shuffleArray(arr) {
       return arr.sort(() => Math.random() - 0.5);
+    }
+
+    async function showAllQuestions() {
+      const res = await fetch(`${API_BASE}/categories`);
+      const data = await res.json();
+      const board = document.getElementById("question-board");
+      board.innerHTML = `
+        <h2>📋 질문 카테고리 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <ul>${data.categories.map(c => `<li onclick="loadQuestions(${c.id})">${c.name}</li>`).join("")}</ul>
+      `;
+    }
+
+    async function loadQuestions(catId) {
+      const res = await fetch(`${API_BASE}/questions/${catId}`);
+      const data = await res.json();
+      const board = document.getElementById("question-board");
+      board.innerHTML = `
+        <h2>📋 질문 목록 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">← 뒤로</span></h2>
+        <ul>${data.questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
+      `;
     }
   </script>
 </body>
