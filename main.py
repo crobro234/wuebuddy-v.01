@@ -1,12 +1,11 @@
 from fastapi import FastAPI, HTTPException, Form
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import os
 from openai import OpenAI
 import numpy as np
-from pydantic import BaseModel
-from typing import List, Dict
 
 # ===============================
 #  초기 설정
@@ -85,89 +84,41 @@ def cosine_similarity(a, b):
 def semantic_search(query: str):
     """OpenAI 임베딩 기반 문맥 검색"""
     try:
+        # 1️⃣ 모든 질문 불러오기
         questions = get_all_questions()
         if not questions:
             return {"results": []}
 
+        # 2️⃣ 검색어 임베딩 생성
         query_embed = client.embeddings.create(
             model="text-embedding-3-small",
             input=query
         ).data[0].embedding
 
+        # 3️⃣ 각 질문 문장 임베딩 생성 + 코사인 유사도 계산
         scored = []
         for q in questions:
             q_embed = client.embeddings.create(
                 model="text-embedding-3-small",
                 input=q["question"]
             ).data[0].embedding
-            similarity = cosine_similarity(np.array(query_embed), np.array(q_embed))
+
+            similarity = cosine_similarity(
+                np.array(query_embed), np.array(q_embed)
+            )
             scored.append((q, similarity))
 
+        # 4️⃣ 유사도 순 정렬 + 임계값 필터링 (0.3 이상만)
         threshold = 0.3
         results = [
             item[0] for item in sorted(scored, key=lambda x: x[1], reverse=True)
             if item[1] >= threshold
         ]
+
         return {"results": results}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# ===============================
-#  🤖 AI 챗봇 기능
-# ===============================
-def embed_text(text: str) -> List[float]:
-    return client.embeddings.create(
-        model="text-embedding-3-small",
-        input=text
-    ).data[0].embedding
-
-def top_k_qa_context(query: str, k: int = 3) -> List[Dict[str, str]]:
-    """로컬 DB의 Q/A 중 질의와 가장 가까운 k개 반환"""
-    questions = get_all_questions()
-    if not questions:
-        return []
-    q_embed = np.array(embed_text(query))
-    scored = []
-    for item in questions:
-        e = np.array(embed_text(item["question"]))
-        sim = cosine_similarity(q_embed, e)
-        scored.append((item, sim))
-    scored.sort(key=lambda x: x[1], reverse=True)
-    return [x[0] for x in scored[:k] if x[1] >= 0.25]
-
-class ChatRequest(BaseModel):
-    message: str
-
-@app.post("/chat")
-def chat(req: ChatRequest):
-    """AI 챗봇: 로컬 Q/A 문맥을 참고해 대화형 응답 제공"""
-    try:
-        ctx_items = top_k_qa_context(req.message, k=3)
-        ctx_text = "\n\n".join([f"- Q: {x['question']}\n  A: {x['answer']}" for x in ctx_items]) or "로컬 문맥 없음"
-
-        system_prompt = (
-            "당신은 독일 뷔르츠부르크 교환학생 도우미 챗봇입니다. "
-            "가능하면 구체적이고 단계별로 답하세요. "
-            "로컬 문맥(아래 제공)과 상충되면 로컬 문맥을 우선하세요. "
-            "확실하지 않은 정보는 추측하지 말고 '확인 필요'라고 말하세요."
-        )
-
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0.4,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user",
-                 "content": f"사용자 질문:\n{req.message}\n\n[로컬 문맥]\n{ctx_text}"}
-            ]
-        )
-
-        answer = completion.choices[0].message.content.strip()
-        return {"answer": answer, "context": ctx_items}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chat error: {e}")
 
 # ===============================
 #  실행 (로컬 테스트용)
