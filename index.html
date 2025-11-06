@@ -105,9 +105,25 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* 🌐 언어 전환 버튼 */
+    #lang-switch {
+      position: fixed;
+      top: 20px;
+      right: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 999;
+      background: rgba(255,255,255,0.8);
+      padding: 6px 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
+
+  <!-- 🌐 언어 전환 -->
+  <div id="lang-switch">🇰🇷 / 🇬🇧</div>
 
   <!-- 🎬 인트로 -->
   <section id="intro1"><h1 data-aos="fade-up">🇩🇪 독일 교환학생이 처음이신가요?</h1></section>
@@ -118,15 +134,19 @@
   <!-- 💬 게시판 -->
   <div id="mainContent" data-aos="fade-in">
     <h2 style="text-align:center; color:#333; margin-bottom:25px;">📚 WueBuddy 게시판</h2>
+
     <div id="question-board" class="board" data-aos="fade-up"></div>
     <div id="campus-board" class="board" data-aos="fade-up"></div>
+
     <div id="mensa-board" class="board" data-aos="fade-up">
       <h2>🥗 Mensa 식단</h2><p>오늘의 메뉴를 확인하세요.</p>
       <button class="btn" onclick="openMensa()">멘자 식단 보러가기 🍽️</button>
     </div>
+
+    <!-- 🍽️ 맛집 (확장) -->
     <div id="food-board" class="board" data-aos="fade-up"></div>
 
-    <!-- ✍️ 자유게시판 -->
+    <!-- ✍️ 자유게시판 (기존 유지) -->
     <div id="free-board" class="board" data-aos="fade-up">
       <h2>✍️ 자유게시판</h2>
       <form id="postForm" onsubmit="createPost(event)">
@@ -145,6 +165,113 @@
     AOS.init({ duration: 1000, once: true });
     const API_BASE = window.location.origin;
 
+    /* ========== 언어 데이터 & 전환 ========== */
+    let currentLang = 'ko';
+    const LANG = {
+      ko: {
+        intro1: "🇩🇪 독일 교환학생이 처음이신가요?",
+        intro2: "🎓 그런데 뷔르츠부르크로 오신다고요?",
+        intro3: "📚 어디서부터 알아봐야 할지 막막하다면,",
+        intro4: "✨ WueBuddy",
+        intro4sub: "당신의 교환학생 생활을 쉽고 즐겁게 만들어줄 도우미 챗봇입니다.",
+        start: "시작하기 🚀",
+        boards: {
+          question: "📋 질문 게시판",
+          campus: "🏫 캠퍼스맵",
+          mensa: "🥗 Mensa 식단",
+          food: "🍽️ 맛집 추천"
+        },
+        more: "더 보기",
+        back: "← 돌아가기",
+        mapBtn: "지도로 보기 🗺️",
+        mensaBtn: "멘자 식단 보러가기 🍽️",
+        noPosts: "아직 작성된 글이 없습니다.",
+        answerTitle: "답변 💬",
+        homeBtn: "처음으로 🔙",
+        addMyRestaurant: "나의 맛집 추가 ➕",
+        addTitle: "🍽️ 나의 맛집 추가",
+        restNamePh: "식당 이름",
+        restLinkPh: "Google 지도 링크",
+        confirmAdd: "등록하기 ✨",
+        reviewHeader: "후기 남기기",
+        reviewPh: "코멘트를 입력하세요",
+        reviewSubmit: "등록",
+        avgLabel: "평균",
+        peopleSuffix: "명"
+      },
+      en: {
+        intro1: "🇩🇪 Is this your first time studying in Germany?",
+        intro2: "🎓 So you’re coming to Würzburg?",
+        intro3: "📚 Feeling lost about where to start?",
+        intro4: "✨ WueBuddy",
+        intro4sub: "Your friendly chatbot to make exchange life easy and fun.",
+        start: "Get Started 🚀",
+        boards: {
+          question: "📋 Q&A Board",
+          campus: "🏫 Campus Map",
+          mensa: "🥗 Mensa Menu",
+          food: "🍽️ Restaurants"
+        },
+        more: "More",
+        back: "← Back",
+        mapBtn: "Open Map 🗺️",
+        mensaBtn: "View Mensa Menu 🍽️",
+        noPosts: "No posts yet.",
+        answerTitle: "Answer 💬",
+        homeBtn: "Back to Home 🔙",
+        addMyRestaurant: "Add My Restaurant ➕",
+        addTitle: "🍽️ Add My Restaurant",
+        restNamePh: "Restaurant name",
+        restLinkPh: "Google Maps link",
+        confirmAdd: "Add ✨",
+        reviewHeader: "Leave a review",
+        reviewPh: "Write a comment",
+        reviewSubmit: "Submit",
+        avgLabel: "Avg",
+        peopleSuffix: ""
+      }
+    };
+
+    function toggleLang() {
+      currentLang = currentLang === 'ko' ? 'en' : 'ko';
+      renderLang();
+    }
+
+    function renderLang() {
+      // Intro
+      document.querySelector("#intro1 h1").innerText = LANG[currentLang].intro1;
+      document.querySelector("#intro2 h1").innerText = LANG[currentLang].intro2;
+      document.querySelector("#intro3 h1").innerText = LANG[currentLang].intro3;
+      document.querySelector("#intro4 h1").innerText = LANG[currentLang].intro4;
+      document.querySelector("#intro4 p").innerText = LANG[currentLang].intro4sub;
+      document.querySelector("#intro4 button").innerText = LANG[currentLang].start;
+
+      // Mensa board button (존재할 때만)
+      const mensaBtn = document.querySelector("#mensa-board .btn");
+      if (mensaBtn) mensaBtn.innerText = LANG[currentLang].mensaBtn;
+
+      // Board headings가 이미 렌더된 뒤에 교체
+      const qh2 = document.querySelector("#question-board h2");
+      const ch2 = document.querySelector("#campus-board h2");
+      const mh2 = document.querySelector("#mensa-board h2");
+      const fh2 = document.querySelector("#food-board h2");
+      if (qh2) qh2.childNodes[0].nodeValue = LANG[currentLang].boards.question + " ";
+      if (ch2) ch2.childNodes[0].nodeValue = LANG[currentLang].boards.campus + " ";
+      if (mh2) mh2.childNodes[0].nodeValue = LANG[currentLang].boards.mensa + " ";
+      if (fh2) fh2.childNodes[0].nodeValue = LANG[currentLang].boards.food + " ";
+
+      // 자유게시판 placeholder
+      const postTitle = document.getElementById("postTitle");
+      const postContent = document.getElementById("postContent");
+      const postBtn = document.querySelector("#postForm button");
+      if (postTitle) postTitle.placeholder = currentLang === 'ko' ? "제목을 입력하세요" : "Enter title";
+      if (postContent) postContent.placeholder = currentLang === 'ko' ? "내용을 입력하세요" : "Enter content";
+      if (postBtn) postBtn.innerText = currentLang === 'ko' ? "등록하기 ✨" : "Post ✨";
+    }
+
+    document.getElementById("lang-switch").addEventListener("click", toggleLang);
+
+    /* ========== 기존 기능 유지 ========== */
     function showMain() {
       document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
       const main = document.getElementById("mainContent");
@@ -158,9 +285,9 @@
       await loadQuestionPreview();
       loadCampusPreview();
       loadFoodPreview();
+      renderLang(); // 보드 렌더 후 언어 텍스트 갱신
     }
 
-    // 📋 기존 함수들 (질문, 캠퍼스, 맛집, 답변 등) — 전부 유지
     async function loadQuestionPreview() {
       const board = document.getElementById("question-board");
       board.innerHTML = "<p>질문 불러오는 중...</p>";
@@ -176,7 +303,7 @@
         if (questions.length === 0) throw new Error();
         const preview = shuffleArray(questions).slice(0, 3);
         board.innerHTML = `
-          <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">더 보기</span></h2>
+          <h2>📋 질문 게시판 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">${LANG[currentLang].more}</span></h2>
           <ul>${preview.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>`;
       } catch {
         board.innerHTML = "<p>❌ 질문을 불러올 수 없습니다.</p>";
@@ -193,41 +320,28 @@
       const preview = shuffleArray(buildings).slice(0, 2);
       const board = document.getElementById("campus-board");
       board.innerHTML = `
-        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">더 보기</span></h2>
+        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="showCampusMap()">${LANG[currentLang].more}</span></h2>
         <ul>${preview.map(b => `<li onclick="showBuilding(${b.id})">${b.name}</li>`).join("")}</ul>
-        <button class="btn" style="margin-top:10px;" onclick="openMapView()">지도로 보기 🗺️</button>`;
+        <button class="btn" style="margin-top:10px;" onclick="openMapView()">${LANG[currentLang].mapBtn}</button>`;
     }
 
-    function loadFoodPreview() {
-      const foods = [
-        { id: 1, name: "Berlin Döner", address: "Domstraße 3, 97070 Würzburg", link: "https://www.google.com/maps?q=Berlin+Döner+Domstraße+3+97070+Würzburg" },
-        { id: 2, name: "L'Osteria Würzburg", address: "Röntgenring 3, 97070 Würzburg", link: "https://www.google.com/maps?q=L'Osteria+Würzburg+Röntgenring+3+97070+Würzburg" }
-      ];
-      window._foods = foods;
-      const preview = shuffleArray(foods).slice(0, 2);
-      const board = document.getElementById("food-board");
-      board.innerHTML = `
-        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">더 보기</span></h2>
-        <ul>${preview.map(f => `<li onclick="showFood(${f.id})">${f.name}</li>`).join("")}</ul>`;
-    }
+    function shuffleArray(arr) { return arr.sort(() => Math.random() - 0.5); }
 
     async function loadAnswer(qId) {
       const res = await fetch(`${API_BASE}/answer/${qId}`);
       const data = await res.json();
       const box = document.getElementById("answer-box");
       box.style.display = "block";
-      box.innerHTML = `<h3>답변 💬</h3><p>${data.answer}</p><button class="btn" onclick="backToHome()">처음으로 🔙</button>`;
+      box.innerHTML = `<h3>${LANG[currentLang].answerTitle}</h3><p>${data.answer}</p><button class="btn" onclick="backToHome()">${LANG[currentLang].homeBtn}</button>`;
     }
 
-    function shuffleArray(arr) { return arr.sort(() => Math.random() - 0.5); }
-
-    // ✍️ 자유게시판
+    /* ✍️ 자유게시판 (기존 유지) */
     async function loadPosts() {
       const res = await fetch(`${API_BASE}/posts`);
       const data = await res.json();
       const postList = document.getElementById("postList");
       if (data.posts.length === 0) {
-        postList.innerHTML = "<p>아직 작성된 글이 없습니다.</p>";
+        postList.innerHTML = `<p>${LANG[currentLang].noPosts}</p>`;
         return;
       }
       postList.innerHTML = data.posts.map(p => `
@@ -242,7 +356,7 @@
       e.preventDefault();
       const title = document.getElementById("postTitle").value.trim();
       const content = document.getElementById("postContent").value.trim();
-      if (!title || !content) return alert("제목과 내용을 모두 입력해주세요!");
+      if (!title || !content) return alert(currentLang === 'ko' ? "제목과 내용을 모두 입력해주세요!" : "Please enter both title and content!");
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
@@ -252,8 +366,137 @@
       document.getElementById("postForm").reset();
       loadPosts();
     }
-        /* 🔧 누락된 기존 함수 복구 */
 
+    /* 🍽️ 맛집 기능 확장 */
+    function loadFoodPreview() {
+      fetch(`${API_BASE}/restaurants`)
+        .then(res => res.json())
+        .then(data => {
+          const f = data.restaurants || [];
+          const preview = f.slice(0, 2);
+          const board = document.getElementById("food-board");
+          board.innerHTML = `
+            <h2>🍽️ ${LANG[currentLang].boards.food} <span style="cursor:pointer;color:#0066ff;" onclick="showFoodList()">${LANG[currentLang].more}</span></h2>
+            <ul>${preview.map(x => `
+              <li onclick="showFood(${x.id})">
+                ${x.name} <span style="color:#ffa500;">⭐ ${Number(x.avg).toFixed(1)}</span>
+              </li>`).join("")}</ul>`;
+        });
+    }
+
+    function showFoodList() {
+      fetch(`${API_BASE}/restaurants`)
+        .then(res => res.json())
+        .then(data => {
+          const f = data.restaurants || [];
+          const board = document.getElementById("food-board");
+          board.innerHTML = `
+            <h2>🍽️ ${LANG[currentLang].boards.food}
+              <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">${LANG[currentLang].back}</span>
+              <button class="btn" style="margin-left:10px;background:#28a745" onclick="openAddRestaurant()">${LANG[currentLang].addMyRestaurant}</button>
+            </h2>
+            <ul>${f.map(x => `
+              <li onclick="showFood(${x.id})">
+                ${x.name} 
+                <span style="color:#ffa500;">⭐ ${Number(x.avg).toFixed(1)}</span>
+                <span style="color:#777;">(${x.count})</span>
+              </li>`).join("")}</ul>`;
+        });
+    }
+
+    function openAddRestaurant() {
+      const box = document.getElementById("answer-box");
+      box.style.display = "block";
+      box.innerHTML = `
+        <h3>${LANG[currentLang].addTitle}</h3>
+        <form id="addRestForm" onsubmit="createRestaurant(event)">
+          <input type="text" id="restName" placeholder="${LANG[currentLang].restNamePh}" required style="width:70%;padding:8px;"><br>
+          <input type="text" id="restLink" placeholder="${LANG[currentLang].restLinkPh}" required style="width:70%;padding:8px;margin-top:5px;"><br>
+          <button type="submit" class="btn" style="margin-top:10px;">${LANG[currentLang].confirmAdd}</button>
+        </form>
+        <button class="btn" style="margin-top:10px;background:#777;" onclick="backToHome()">${LANG[currentLang].back}</button>
+      `;
+    }
+
+    function createRestaurant(e) {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("name", document.getElementById("restName").value.trim());
+      formData.append("link", document.getElementById("restLink").value.trim());
+      fetch(`${API_BASE}/restaurants/new`, { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          backToHome();
+        });
+    }
+
+    function showFood(id) {
+      fetch(`${API_BASE}/restaurants`)
+        .then(res => res.json())
+        .then(data => {
+          const f = (data.restaurants || []).find(x => x.id === id);
+          if (!f) return;
+          const box = document.getElementById("answer-box");
+          box.style.display = "block";
+          box.innerHTML = `
+            <h3>${f.name}</h3>
+            <p><a class="map-link" href="${f.link}" target="_blank">Google Maps</a></p>
+            <p>⭐ ${LANG[currentLang].avgLabel} ${Number(f.avg).toFixed(1)} (${f.count}${LANG[currentLang].peopleSuffix})</p>
+
+            <h4>${LANG[currentLang].reviewHeader}</h4>
+            <form id="reviewForm" onsubmit="createReview(event, ${f.id})">
+              <select id="rating" required>
+                <option value="">${currentLang === 'ko' ? '별점 선택' : 'Select rating'}</option>
+                ${[1,2,3,4,5].map(x => `<option value="${x}">${'⭐'.repeat(x)}</option>`).join("")}
+              </select><br>
+              <textarea id="comment" placeholder="${LANG[currentLang].reviewPh}" required
+                style="width:80%;height:60px;margin-top:6px;padding:8px;"></textarea><br>
+              <button type="submit" class="btn">${LANG[currentLang].reviewSubmit}</button>
+            </form>
+
+            <div id="reviewList" style="margin-top:15px;"></div>
+            <button class="btn" onclick="backToHome()">${LANG[currentLang].homeBtn}</button>
+          `;
+          loadReviews(id);
+        });
+    }
+
+    function createReview(e, id) {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("restaurant_id", id);
+      formData.append("rating", document.getElementById("rating").value);
+      formData.append("comment", document.getElementById("comment").value);
+      fetch(`${API_BASE}/reviews/new`, { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          loadReviews(id);
+          document.getElementById("reviewForm").reset();
+        });
+    }
+
+    function loadReviews(id) {
+      fetch(`${API_BASE}/reviews/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("reviewList");
+          const list = data.reviews || [];
+          if (!list.length) {
+            container.innerHTML = `<p>${currentLang === 'ko' ? '아직 후기가 없습니다.' : 'No reviews yet.'}</p>`;
+            return;
+          }
+          container.innerHTML = list.map(r => `
+            <div style="border-bottom:1px solid #ddd;padding:6px 0;">
+              <b>${'⭐'.repeat(r.rating)}</b> - ${r.comment}
+              <div style="font-size:0.9em;color:#888;">${r.created_at}</div>
+            </div>
+          `).join("");
+        });
+    }
+
+    /* ====== 기존 보조 함수 (누락 방지) ====== */
     function backToHome() {
       document.getElementById("answer-box").style.display = "none";
       loadBoards();
@@ -265,7 +508,7 @@
       const b = window._buildings;
       const board = document.getElementById("campus-board");
       board.innerHTML = `
-        <h2>🏫 캠퍼스맵 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <h2>🏫 ${LANG[currentLang].boards.campus} <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">${LANG[currentLang].back}</span></h2>
         <ul>${b.map(x => `<li onclick="showBuilding(${x.id})">${x.name}</li>`).join("")}</ul>
       `;
     }
@@ -277,8 +520,8 @@
       box.innerHTML = `
         <h3>${b.name}</h3>
         <p>📍 ${b.address}</p>
-        <p><a class="map-link" href="${b.link}" target="_blank">Google Maps로 보기 🔗</a></p>
-        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
+        <p><a class="map-link" href="${b.link}" target="_blank">Google Maps</a></p>
+        <button class="btn" onclick="backToHome()">${LANG[currentLang].homeBtn}</button>
       `;
     }
 
@@ -287,13 +530,13 @@
       const mapView = document.createElement("div");
       mapView.id = "campus-map-view";
       mapView.innerHTML = `
-        <h2>🏫 WueBuddy 캠퍼스 지도</h2>
+        <h2>🏫 ${LANG[currentLang].boards.campus}</h2>
         <iframe 
           src="https://www.google.com/maps/d/u/0/embed?mid=1xLYXxhEnRby6e9MDMGtbcvEJCEIAxXU&ehbc=2E312F"
           width="90%" height="600"
           style="border-radius:12px; border:0; margin-top:10px;">
         </iframe>
-        <button class="btn" style="margin-top:15px;" onclick="closeMapView()">← 돌아가기</button>
+        <button class="btn" style="margin-top:15px;" onclick="closeMapView()">${LANG[currentLang].back}</button>
       `;
       document.getElementById("mainContent").appendChild(mapView);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -310,33 +553,12 @@
       window.open("https://www.swerk-wue.de/wuerzburg/essen-trinken/mensen-speiseplaene/mensa-campus-hubland-sued/menu", "_blank");
     }
 
-    function showFoodList() {
-      const f = window._foods;
-      const board = document.getElementById("food-board");
-      board.innerHTML = `
-        <h2>🍽️ 맛집 추천 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
-        <ul>${f.map(x => `<li onclick="showFood(${x.id})">${x.name}</li>`).join("")}</ul>
-      `;
-    }
-
-    function showFood(id) {
-      const f = window._foods.find(x => x.id === id);
-      const box = document.getElementById("answer-box");
-      box.style.display = "block";
-      box.innerHTML = `
-        <h3>${f.name}</h3>
-        <p>📍 ${f.address}</p>
-        <p><a class="map-link" href="${f.link}" target="_blank">Google Maps로 보기 🔗</a></p>
-        <button class="btn" onclick="backToHome()">처음으로 🔙</button>
-      `;
-    }
-
     async function showAllQuestions() {
       const res = await fetch(`${API_BASE}/categories`);
       const data = await res.json();
       const board = document.getElementById("question-board");
       board.innerHTML = `
-        <h2>📋 질문 카테고리 <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">← 돌아가기</span></h2>
+        <h2>📋 ${LANG[currentLang].boards.question} <span style="cursor:pointer;color:#0066ff;" onclick="loadBoards()">${LANG[currentLang].back}</span></h2>
         <ul>${data.categories.map(c => `<li onclick="loadQuestions(${c.id})">${c.name}</li>`).join("")}</ul>
       `;
     }
@@ -346,12 +568,10 @@
       const data = await res.json();
       const board = document.getElementById("question-board");
       board.innerHTML = `
-        <h2>📋 질문 목록 <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">← 뒤로</span></h2>
+        <h2>📋 ${LANG[currentLang].boards.question} <span style="cursor:pointer;color:#0066ff;" onclick="showAllQuestions()">${LANG[currentLang].back}</span></h2>
         <ul>${data.questions.map(q => `<li onclick="loadAnswer(${q.id})">${q.question}</li>`).join("")}</ul>
       `;
     }
-
   </script>
 </body>
 </html>
-
