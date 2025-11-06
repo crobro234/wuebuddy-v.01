@@ -84,18 +84,15 @@ def cosine_similarity(a, b):
 def semantic_search(query: str):
     """OpenAI 임베딩 기반 문맥 검색"""
     try:
-        # 1️⃣ 모든 질문 불러오기
         questions = get_all_questions()
         if not questions:
             return {"results": []}
 
-        # 2️⃣ 검색어 임베딩 생성
         query_embed = client.embeddings.create(
             model="text-embedding-3-small",
             input=query
         ).data[0].embedding
 
-        # 3️⃣ 각 질문 문장 임베딩 생성 + 코사인 유사도 계산
         scored = []
         for q in questions:
             q_embed = client.embeddings.create(
@@ -108,24 +105,21 @@ def semantic_search(query: str):
             )
             scored.append((q, similarity))
 
-        # 4️⃣ 유사도 순 정렬 + 임계값 필터링 (0.3 이상만)
         threshold = 0.3
         results = [
             item[0] for item in sorted(scored, key=lambda x: x[1], reverse=True)
             if item[1] >= threshold
         ]
-
         return {"results": results}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===============================
-#  ✍️ 자유게시판 기능 추가
+#  ✍️ 자유게시판 (유지)
 # ===============================
 @app.get("/posts")
 def get_posts():
-    """자유게시판 글 목록 불러오기"""
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("SELECT id, title, content, created_at FROM posts ORDER BY id DESC")
@@ -135,7 +129,6 @@ def get_posts():
 
 @app.post("/posts/new")
 def create_post(title: str = Form(...), content: str = Form(...)):
-    """새 게시글 작성"""
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("INSERT INTO posts (title, content, created_at) VALUES (?, ?, ?)",
@@ -143,6 +136,68 @@ def create_post(title: str = Form(...), content: str = Form(...)):
     conn.commit()
     conn.close()
     return JSONResponse({"message": "✅ 게시글이 등록되었습니다."})
+
+# ===============================
+#  🍽️ 맛집 기능 추가
+# ===============================
+
+@app.get("/restaurants")
+def get_restaurants():
+    """맛집 목록 + 평균 평점"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT r.id, r.name, r.link,
+               IFNULL(ROUND(AVG(rv.rating),1), 0) as avg_rating,
+               COUNT(rv.id) as review_count
+        FROM restaurants r
+        LEFT JOIN reviews rv ON r.id = rv.restaurant_id
+        GROUP BY r.id
+        ORDER BY r.id DESC
+    """)
+    data = [
+        {"id": row[0], "name": row[1], "link": row[2],
+         "avg": row[3], "count": row[4]}
+        for row in cur.fetchall()
+    ]
+    conn.close()
+    return {"restaurants": data}
+
+@app.post("/restaurants/new")
+def add_restaurant(name: str = Form(...), link: str = Form(...)):
+    """맛집 추가"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO restaurants (name, link) VALUES (?, ?)", (name, link))
+    conn.commit()
+    conn.close()
+    return JSONResponse({"message": "✅ 맛집이 추가되었습니다!"})
+
+@app.post("/reviews/new")
+def add_review(restaurant_id: int = Form(...), rating: int = Form(...), comment: str = Form(...)):
+    """후기 추가 (별점 + 코멘트)"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO reviews (restaurant_id, rating, comment) VALUES (?, ?, ?)",
+                (restaurant_id, rating, comment))
+    conn.commit()
+    conn.close()
+    return JSONResponse({"message": "⭐ 후기 등록 완료!"})
+
+@app.get("/reviews/{restaurant_id}")
+def get_reviews(restaurant_id: int):
+    """특정 맛집 후기 조회"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT rating, comment, created_at
+        FROM reviews
+        WHERE restaurant_id=?
+        ORDER BY id DESC
+    """, (restaurant_id,))
+    data = [{"rating": r[0], "comment": r[1], "created_at": r[2]} for r in cur.fetchall()]
+    conn.close()
+    return {"reviews": data}
 
 # ===============================
 #  실행 (로컬 테스트용)
